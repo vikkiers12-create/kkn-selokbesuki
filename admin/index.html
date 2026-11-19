@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Desa SelokBesuki</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="admin.css"/>
+</head>
+<body class="login-page">
+
+  <div class="login-bg">
+    <div class="login-blob b1"></div>
+    <div class="login-blob b2"></div>
+  </div>
+
+  <div class="login-card">
+    <div class="login-logo">🌾</div>
+    <h1>Panel Admin</h1>
+    <p class="login-sub">Desa SelokBesuki — Sistem Informasi Desa</p>
+
+    <form id="loginForm" novalidate>
+      <div class="fl-group">
+        <label>Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="username" required/>
+        </div>
+      </div>
+      <div class="fl-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="loginPass" placeholder="Masukkan password" autocomplete="current-password" required/>
+          <button type="button" class="toggle-pass" id="togglePass">👁️</button>
+        </div>
+      </div>
+
+      <div id="loginError" class="login-error hidden">
+        ❌ Username atau password salah. Coba lagi.
+      </div>
+
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span id="loginBtnText">Masuk ke Dashboard</span>
+      </button>
+    </form>
+
+    <div class="login-hint">
+      <span>Default: <code>admin</code> / <code>admin123</code></span>
+      <a href="../index.html" class="back-publik">← Ke Web Publik</a>
+    </div>
+  </div>
+
+  <script src="../shared-data.js"></script>
+  <script>
+    DesaDB.init();
+
+    // Jika sudah login, langsung ke dashboard
+    if (DesaDB.isLoggedIn()) location.href = 'dashboard.html';
+
+    const form = document.getElementById('loginForm');
+    const errEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('loginBtnText');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value;
+      errEl.classList.add('hidden');
+      btn.disabled = true;
+      btnText.textContent = '⏳ Memeriksa…';
+      setTimeout(() => {
+        if (DesaDB.login(user, pass)) {
+          DesaDB.logActivity(`Login sebagai ${user}`);
+          btnText.textContent = '✅ Berhasil! Mengalihkan…';
+          setTimeout(() => location.href = 'dashboard.html', 600);
+        } else {
+          errEl.classList.remove('hidden');
+          btn.disabled = false;
+          btnText.textContent = 'Masuk ke Dashboard';
+          document.getElementById('loginPass').value = '';
+        }
+      }, 700);
+    });
+
+    document.getElementById('togglePass').addEventListener('click', () => {
+      const inp = document.getElementById('loginPass');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+  </script>
+</body>
+</html>
